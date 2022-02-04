@@ -8,8 +8,6 @@ public class GameCanvas : MonoBehaviour
 {
     [SerializeField]
     private List<Cell> cellsList;
-    [SerializeField]
-    public Transform DragPanel;
 
     [SerializeField]
     public Text Score;

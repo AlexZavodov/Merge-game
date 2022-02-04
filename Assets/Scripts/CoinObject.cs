@@ -6,8 +6,8 @@ public class CoinObject : PlacedObject
 {
 
     public override void ClickOnObject()
-    {
-        PlayerData.Instance.ChangeScore(10);
-        DestroySelf();
+    {//вместо объекта ClickToDestroy можно раскоментировать эти строки
+        //PlayerData.Instance.ChangeScore(10);
+        //DestroySelf();
     }
 }

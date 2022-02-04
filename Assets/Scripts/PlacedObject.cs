@@ -14,16 +14,20 @@ public class PlacedObject : MonoBehaviour, IPointerDownHandler, IBeginDragHandle
 
     bool isDrag = false;
 
-    public static PlacedObject Create (PlacedTypeSO placedType, Cell parent)
+    public static PlacedObject Create (PlacedTypeSO placedType, Cell parent, Transform creator = null)
     {
-        RectTransform transform = Instantiate(placedType.Prefab, parent.transform);
+        RectTransform transform;
+        if (creator == null)
+            transform = Instantiate(placedType.Prefab, parent.transform);
+        else
+            transform = Instantiate(placedType.Prefab, creator.position, Quaternion.identity, parent.transform);
 
         PlacedObject placedObject = transform.GetComponent<PlacedObject>();
         placedObject.PlacedType = placedType;
-
-        
         placedObject.SetParent(parent);
+
         parent.SetPlacedObject(placedObject);
+        parent.rectTransform.SetAsLastSibling();
 
         return placedObject;
     }
@@ -36,38 +40,35 @@ public class PlacedObject : MonoBehaviour, IPointerDownHandler, IBeginDragHandle
     }
 
     #region DragDrop
+    //классический DragDrop
     public void OnBeginDrag(PointerEventData eventData)
     {
-        LastParent = transform.parent.GetComponent<Cell>();
+        rectTransform.position = eventData.pointerCurrentRaycast.worldPosition; // перемещение к положению мыши
 
-        rectTransform.position = eventData.pointerCurrentRaycast.worldPosition;
-        
-        transform.SetParent(GameManager.Instance.Canvas.DragPanel);
+        LastParent.rectTransform.SetAsLastSibling(); //фикс отображения
+
         canvasGroup.blocksRaycasts = false;
 
         isDrag = true;
-        Debug.Log("OnBeginDrag");
+        //Debug.Log("OnBeginDrag");
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
-        Debug.Log("OnDrag");
+        //Debug.Log("OnDrag");
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (transform.parent == GameManager.Instance.Canvas.DragPanel)
-        {
-            SetParent(LastParent);
-        }
+        SetParent(LastParent);
         canvasGroup.blocksRaycasts = true;
-        Debug.Log("OnEndDrag");
+        //Debug.Log("OnEndDrag");
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        Debug.Log("OnEndDrag");
+        //Debug.Log("OnEndDrag");
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -85,18 +86,34 @@ public class PlacedObject : MonoBehaviour, IPointerDownHandler, IBeginDragHandle
     {
         transform.SetParent(cell.transform);
         LastParent = cell;
-        rectTransform.anchoredPosition = Vector3.zero;
+        //rectTransform.anchoredPosition = Vector2.zero; //закоментите Update и раскоментите строку для отключения анимации перемещения
+       
     }
+
+    //движение к точке
+    private void Update()
+    {
+        if (Vector2.Distance(Vector2.zero, rectTransform.anchoredPosition) > .5f && !isDrag)
+        {
+            rectTransform.anchoredPosition = Vector2.Lerp(rectTransform.anchoredPosition, Vector2.zero, Time.deltaTime * 5);
+        }else
+        if (Vector2.Distance(Vector2.zero, rectTransform.anchoredPosition) < .5f && !isDrag && rectTransform.anchoredPosition != Vector2.zero)
+        {
+            rectTransform.anchoredPosition = Vector2.zero;
+        }
+    }
+
     public void DestroySelf()
     {
         Destroy(this.gameObject);
     }
-
+    
     public PlacedTypeSO MergeObject(PlacedObject placedObject)
     {
         return PlacedType[NumberOfNextMergeObject(placedObject)];
     }
 
+    //переопределять если в наследниках больше одного возможного merge объекта
     public virtual int NumberOfNextMergeObject(PlacedObject placedObject)
     {
         if (placedObject.PlacedType.Name == this.PlacedType.Name)
@@ -107,7 +124,7 @@ public class PlacedObject : MonoBehaviour, IPointerDownHandler, IBeginDragHandle
         return 99;
     }
 
-
+    //переопределять для клика по объекту
     public virtual void ClickOnObject()
     {
     }

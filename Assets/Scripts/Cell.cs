@@ -12,6 +12,8 @@ public class Cell : MonoBehaviour, IDropHandler
     [SerializeField]
     private PlacedObject placedObject;
 
+    public RectTransform rectTransform { get; private set; }
+
     public PlacedObject PlacedObject
     {
         get
@@ -28,6 +30,12 @@ public class Cell : MonoBehaviour, IDropHandler
         }
     }
 
+    private void Awake()
+    {
+        rectTransform = GetComponent<RectTransform>();
+    }
+
+    //главная функция, разделяет меремещение и мердж
     public void OnDrop(PointerEventData eventData)
     {
         PlacedObject eventObject = eventData.pointerDrag.GetComponent<PlacedObject>();
@@ -53,16 +61,23 @@ public class Cell : MonoBehaviour, IDropHandler
                     GameManager.Instance.RandomMoveObject(placedObject, position);
 
                     MoveHereObject(eventObject, false);
+
                 }    
                 
             }
         }
     }
 
+    //перемещает объект в эту клетку, empty если до этого клетка была пустая
     public void MoveHereObject(PlacedObject moveObject, bool empty = true)
     {
-        placedObject = moveObject;
-        if (empty) placedObject.LastParent.placedObject = null;
+        SetPlacedObject(moveObject);
+
+        if (empty)
+        {
+            placedObject.LastParent.placedObject = null;
+            rectTransform.SetAsLastSibling();
+        }
 
         placedObject.SetParent(this);
     }

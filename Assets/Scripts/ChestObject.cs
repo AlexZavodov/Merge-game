@@ -12,6 +12,6 @@ public class ChestObject : PlacedObject
     public override void ClickOnObject()
     {
         int random = Random.Range(0, Lvl1.PlacedTypes.Count);
-        GameManager.Instance.CreateObject(Lvl1.PlacedTypes[random], LastParent.Position);
+        GameManager.Instance.CreateObject(Lvl1.PlacedTypes[random], LastParent.Position, transform);
     }
 }

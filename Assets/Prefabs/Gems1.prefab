@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 150756599054809959}
   - component: {fileID: 6371368898405091882}
   - component: {fileID: -4679608528537595658}
+  - component: {fileID: -7207995841383801528}
   m_Layer: 5
   m_Name: Gems1
   m_TagString: Untagged
@@ -101,3 +102,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca7f2597d8466c24984bd13d7f34c482, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!210 &-7207995841383801528
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2592038432524424808}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0

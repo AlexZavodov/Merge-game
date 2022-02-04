@@ -53,7 +53,9 @@ public class GameManager : MonoBehaviour
     public void SetCanvas(GameCanvas canvas)
     {
         this.Canvas = canvas;
-/*
+
+/*      //вписывать объекты сюда
+ *      
         PlacedObject.Create(TestObj, canvas.cells[1, 1]);
         PlacedObject.Create(TestObj, canvas.cells[1, 2]);
         PlacedObject.Create(TestObj, canvas.cells[1, 3]);
@@ -73,7 +75,8 @@ public class GameManager : MonoBehaviour
         PlacedObject.Create(Chest, canvas.cells[3, 3]);
     }
 
-    public void CreateObject(PlacedTypeSO placedType, Vector2Int point)
+    //создание объектов в игре, объект встаёт в ближайшую свободную клетку
+    public void CreateObject(PlacedTypeSO placedType, Vector2Int point, Transform creator = null)
     {
         if ((point.x < 0 || point.x >= 7) || (point.y < 0 || point.y >= 7))
             point = new Vector2Int(UnityEngine.Random.Range(0, 7), UnityEngine.Random.Range(0, 7));
@@ -82,28 +85,30 @@ public class GameManager : MonoBehaviour
 
         if (freeCell != new Vector2Int(-1, -1))
         {
-            PlacedObject.Create(placedType, Canvas.cells[freeCell.x, freeCell.y]);
+            PlacedObject.Create(placedType, Canvas.cells[freeCell.x, freeCell.y], creator);
         }
     }
 
+    //перемещение объекта в ближайшую свободную клетку
     public bool RandomMoveObject(PlacedObject placedObject, Vector2Int point)
     {
         Vector2Int freeCell = FindFreeSpace(point);
         
         if (freeCell != new Vector2Int(-1, -1))
         {
-            Canvas.cells[freeCell.x, freeCell.y].MoveHereObject(placedObject, false);
+            Canvas.cells[freeCell.x, freeCell.y].MoveHereObject(placedObject);
             return true;
         }
 
         return false;
     }
 
+    //поиск ближайшей свободной клетки, возвращает (-1,-1) если её нет
     public Vector2Int FindFreeSpace(Vector2Int refPoint)
     {
         if ((refPoint.x < 0 || refPoint.x >= 7) || (refPoint.y < 0 || refPoint.y >= 7)) return new Vector2Int(-1, -1);
 
-        /*
+        /* // с использованием Dictionary и Linq, находит лишь одну клетку
         Dictionary<Vector2Int, float> distanceToFreePoints = new Dictionary<Vector2Int, float>();
 
         for (int i = 0; i < 7; i++)
@@ -115,9 +120,10 @@ public class GameManager : MonoBehaviour
 
         Vector2Int result = distanceToFreePoints.Aggregate((l, r) => l.Value < r.Value ? l : r).Key;
 
-        return result
+        return result;
         */
 
+        //с Comparable классом, возможны несколько ближайших вариантов, выбирает рандомно
         List<DistanceToFreePoints> distanceToFreePoints = new List<DistanceToFreePoints>();
 
         for (int i = 0; i < 7; i++)
